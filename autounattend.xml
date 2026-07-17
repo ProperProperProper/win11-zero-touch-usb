@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="utf-8"?>
+<unattend xmlns="urn:schemas-microsoft-com:unattend">
+
+  <!-- ══════════════════════════════════════════════════════════════════════
+       Pass 1 — windowsPE
+       Melbourne, Australia — en-AU locale, AUS Eastern Standard Time
+       ══════════════════════════════════════════════════════════════════════ -->
+  <settings pass="windowsPE">
+
+    <component name="Microsoft-Windows-International-Core-WinPE"
+               processorArchitecture="amd64"
+               publicKeyToken="31bf3856ad364e35"
+               language="neutral" versionScope="nonSxS"
+               xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State">
+      <SetupUILanguage>
+        <UILanguage>en-US</UILanguage>
+        <WillShowUI>Never</WillShowUI>
+      </SetupUILanguage>
+      <InputLocale>0C09:00000409</InputLocale>
+      <SystemLocale>en-AU</SystemLocale>
+      <UILanguage>en-US</UILanguage>
+      <UILanguageFallback>en-US</UILanguageFallback>
+      <UserLocale>en-AU</UserLocale>
+    </component>
+
+    <component name="Microsoft-Windows-Setup"
+               processorArchitecture="amd64"
+               publicKeyToken="31bf3856ad364e35"
+               language="neutral" versionScope="nonSxS"
+               xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State">
+
+      <ImageInstall>
+        <OSImage>
+          <InstallFrom>
+            <MetaData wcm:action="add">
+              <Key>/IMAGE/EDITIONID</Key>
+              <Value>ProfessionalN</Value>
+            </MetaData>
+          </InstallFrom>
+          <InstallTo>
+            <DiskID>0</DiskID>
+            <PartitionID>3</PartitionID>
+          </InstallTo>
+          <WillShowUI>Never</WillShowUI>
+          <InstallToAvailablePartition>false</InstallToAvailablePartition>
+        </OSImage>
+      </ImageInstall>
+
+      <DiskConfiguration>
+        <WillShowUI>Never</WillShowUI>
+        <Disk wcm:action="add">
+          <DiskID>0</DiskID>
+          <WillWipeDisk>true</WillWipeDisk>
+          <CreatePartitions>
+            <CreatePartition wcm:action="add">
+              <Order>1</Order><Type>EFI</Type><Size>300</Size>
+            </CreatePartition>
+            <CreatePartition wcm:action="add">
+              <Order>2</Order><Type>MSR</Type><Size>16</Size>
+            </CreatePartition>
+            <CreatePartition wcm:action="add">
+              <Order>3</Order><Type>Primary</Type><Extend>true</Extend>
+            </CreatePartition>
+          </CreatePartitions>
+          <ModifyPartitions>
+            <ModifyPartition wcm:action="add">
+              <Order>1</Order><PartitionID>1</PartitionID>
+              <Label>System</Label><Format>FAT32</Format>
+            </ModifyPartition>
+            <ModifyPartition wcm:action="add">
+              <Order>2</Order><PartitionID>2</PartitionID>
+            </ModifyPartition>
+            <ModifyPartition wcm:action="add">
+              <Order>3</Order><PartitionID>3</PartitionID>
+              <Label>Windows</Label><Format>NTFS</Format><Letter>C</Letter>
+            </ModifyPartition>
+          </ModifyPartitions>
+        </Disk>
+      </DiskConfiguration>
+
+      <UserData>
+        <AcceptEula>true</AcceptEula>
+        <FullName>User</FullName>
+        <Organization></Organization>
+      </UserData>
+
+      <EnableFirewall>true</EnableFirewall>
+      <EnableNetwork>true</EnableNetwork>
+
+    </component>
+  </settings>
+
+  <!-- ══════════════════════════════════════════════════════════════════════
+       Pass 4 — specialize
+       ══════════════════════════════════════════════════════════════════════ -->
+  <settings pass="specialize">
+
+    <component name="Microsoft-Windows-International-Core"
+               processorArchitecture="amd64"
+               publicKeyToken="31bf3856ad364e35"
+               language="neutral" versionScope="nonSxS"
+               xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State">
+      <InputLocale>0C09:00000409</InputLocale>
+      <SystemLocale>en-AU</SystemLocale>
+      <UILanguage>en-US</UILanguage>
+      <UILanguageFallback>en-US</UILanguageFallback>
+      <UserLocale>en-AU</UserLocale>
+    </component>
+
+    <component name="Microsoft-Windows-Shell-Setup"
+               processorArchitecture="amd64"
+               publicKeyToken="31bf3856ad364e35"
+               language="neutral" versionScope="nonSxS"
+               xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State">
+      <ComputerName>*</ComputerName>
+      <TimeZone>AUS Eastern Standard Time</TimeZone>
+    </component>
+
+    <component name="Microsoft-Windows-Deployment"
+               processorArchitecture="amd64"
+               publicKeyToken="31bf3856ad364e35"
+               language="neutral" versionScope="nonSxS"
+               xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State">
+      <RunSynchronous>
+
+        <RunSynchronousCommand wcm:action="add">
+          <Order>1</Order>
+          <Path>cmd /c mkdir C:\Windows\Setup\Scripts</Path>
+        </RunSynchronousCommand>
+
+        <!-- Copy all scripts from USB -->
+        <RunSynchronousCommand wcm:action="add">
+          <Order>2</Order>
+          <Path>cmd /c "for %d in (D E F G H I J K L M N O P) do if exist %d:\scripts\install-drivers.ps1 copy /Y %d:\scripts\install-drivers.ps1 C:\Windows\Setup\Scripts\"</Path>
+        </RunSynchronousCommand>
+        <RunSynchronousCommand wcm:action="add">
+          <Order>3</Order>
+          <Path>cmd /c "for %d in (D E F G H I J K L M N O P) do if exist %d:\scripts\setup-workstation.ps1 copy /Y %d:\scripts\setup-workstation.ps1 C:\Windows\Setup\Scripts\"</Path>
+        </RunSynchronousCommand>
+        <RunSynchronousCommand wcm:action="add">
+          <Order>4</Order>
+          <Path>cmd /c "for %d in (D E F G H I J K L M N O P) do if exist %d:\scripts\apply-security-baseline.ps1 copy /Y %d:\scripts\apply-security-baseline.ps1 C:\Windows\Setup\Scripts\"</Path>
+        </RunSynchronousCommand>
+        <RunSynchronousCommand wcm:action="add">
+          <Order>5</Order>
+          <Path>cmd /c "for %d in (D E F G H I J K L M N O P) do if exist %d:\scripts\run-updates.ps1 copy /Y %d:\scripts\run-updates.ps1 C:\Windows\Setup\Scripts\"</Path>
+        </RunSynchronousCommand>
+
+        <!-- Execution policy -->
+        <RunSynchronousCommand wcm:action="add">
+          <Order>6</Order>
+          <Path>cmd /c powershell -Command "Set-ExecutionPolicy Unrestricted -Scope LocalMachine -Force"</Path>
+        </RunSynchronousCommand>
+
+        <!-- Skip all OOBE screens -->
+        <RunSynchronousCommand wcm:action="add">
+          <Order>7</Order>
+          <Path>reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\OOBE" /v SkipMachineOOBE /t REG_DWORD /d 1 /f</Path>
+        </RunSynchronousCommand>
+        <RunSynchronousCommand wcm:action="add">
+          <Order>8</Order>
+          <Path>reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\OOBE" /v SkipUserOOBE /t REG_DWORD /d 1 /f</Path>
+        </RunSynchronousCommand>
+
+        <!-- Suppress privacy/telemetry consent screen -->
+        <RunSynchronousCommand wcm:action="add">
+          <Order>9</Order>
+          <Path>reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\OOBE" /v DisablePrivacyExperience /t REG_DWORD /d 1 /f</Path>
+        </RunSynchronousCommand>
+
+        <!-- Set Australia GeoID — suppresses country/region prompt -->
+        <RunSynchronousCommand wcm:action="add">
+          <Order>10</Order>
+          <Path>reg add "HKCU\Control Panel\International\Geo" /v Nation /t REG_SZ /d 12 /f</Path>
+        </RunSynchronousCommand>
+        <RunSynchronousCommand wcm:action="add">
+          <Order>11</Order>
+          <Path>reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" /v GeoID /t REG_DWORD /d 12 /f</Path>
+        </RunSynchronousCommand>
+
+        <!-- Telemetry off -->
+        <RunSynchronousCommand wcm:action="add">
+          <Order>12</Order>
+          <Path>reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DataCollection" /v AllowTelemetry /t REG_DWORD /d 0 /f</Path>
+        </RunSynchronousCommand>
+
+        <!-- Block bloat reinstall -->
+        <RunSynchronousCommand wcm:action="add">
+          <Order>13</Order>
+          <Path>reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\CloudContent" /v DisableWindowsConsumerFeatures /t REG_DWORD /d 1 /f</Path>
+        </RunSynchronousCommand>
+        <RunSynchronousCommand wcm:action="add">
+          <Order>14</Order>
+          <Path>reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\CloudContent" /v DisableCloudOptimizedContent /t REG_DWORD /d 1 /f</Path>
+        </RunSynchronousCommand>
+        <RunSynchronousCommand wcm:action="add">
+          <Order>15</Order>
+          <Path>reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v SilentInstalledAppsEnabled /t REG_DWORD /d 0 /f</Path>
+        </RunSynchronousCommand>
+        <RunSynchronousCommand wcm:action="add">
+          <Order>16</Order>
+          <Path>reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v PreInstalledAppsEnabled /t REG_DWORD /d 0 /f</Path>
+        </RunSynchronousCommand>
+        <RunSynchronousCommand wcm:action="add">
+          <Order>17</Order>
+          <Path>reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v OemPreInstalledAppsEnabled /t REG_DWORD /d 0 /f</Path>
+        </RunSynchronousCommand>
+
+        <!-- Copilot off -->
+        <RunSynchronousCommand wcm:action="add">
+          <Order>18</Order>
+          <Path>reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsCopilot" /v TurnOffWindowsCopilot /t REG_DWORD /d 1 /f</Path>
+        </RunSynchronousCommand>
+
+        <!-- Ensure no legal notice banner blocks auto-login
+             (banner is applied AFTER setup completes in the security script) -->
+        <RunSynchronousCommand wcm:action="add">
+          <Order>19</Order>
+          <Path>reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v LegalNoticeCaption /t REG_SZ /d "" /f</Path>
+        </RunSynchronousCommand>
+        <RunSynchronousCommand wcm:action="add">
+          <Order>20</Order>
+          <Path>reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v LegalNoticeText /t REG_SZ /d "" /f</Path>
+        </RunSynchronousCommand>
+
+      </RunSynchronous>
+    </component>
+
+  </settings>
+
+  <!-- ══════════════════════════════════════════════════════════════════════
+       Pass 7 — oobeSystem
+       Melbourne, Australia — full locale, no prompts, auto-login
+       ══════════════════════════════════════════════════════════════════════ -->
+  <settings pass="oobeSystem">
+
+    <!-- Must set locale here too or Windows re-prompts region/keyboard -->
+    <component name="Microsoft-Windows-International-Core"
+               processorArchitecture="amd64"
+               publicKeyToken="31bf3856ad364e35"
+               language="neutral" versionScope="nonSxS"
+               xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State">
+      <InputLocale>0C09:00000409</InputLocale>
+      <SystemLocale>en-AU</SystemLocale>
+      <UILanguage>en-US</UILanguage>
+      <UILanguageFallback>en-US</UILanguageFallback>
+      <UserLocale>en-AU</UserLocale>
+    </component>
+
+    <component name="Microsoft-Windows-Shell-Setup"
+               processorArchitecture="amd64"
+               publicKeyToken="31bf3856ad364e35"
+               language="neutral" versionScope="nonSxS"
+               xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State">
+
+      <OOBE>
+        <HideEULAPage>true</HideEULAPage>
+        <HideOEMRegistrationScreen>true</HideOEMRegistrationScreen>
+        <HideOnlineAccountScreens>true</HideOnlineAccountScreens>
+        <HideWirelessSetupInOOBE>true</HideWirelessSetupInOOBE>
+        <HideLocalAccountScreen>true</HideLocalAccountScreen>
+        <SkipMachineOOBE>true</SkipMachineOOBE>
+        <SkipUserOOBE>true</SkipUserOOBE>
+      </OOBE>
+
+      <TimeZone>AUS Eastern Standard Time</TimeZone>
+
+      <UserAccounts>
+        <LocalAccounts>
+          <LocalAccount wcm:action="add">
+            <Name>User</Name>
+            <Group>Administrators</Group>
+            <Password>
+              <Value></Value>
+              <PlainText>true</PlainText>
+            </Password>
+          </LocalAccount>
+        </LocalAccounts>
+      </UserAccounts>
+
+      <!-- Auto-login once for unattended setup scripts -->
+      <AutoLogon>
+        <Enabled>true</Enabled>
+        <Username>User</Username>
+        <LogonCount>1</LogonCount>
+        <Password>
+          <Value></Value>
+          <PlainText>true</PlainText>
+        </Password>
+      </AutoLogon>
+
+      <FirstLogonCommands>
+        <!-- 1. Debloat + workstation config -->
+        <SynchronousCommand wcm:action="add">
+          <Order>1</Order>
+          <CommandLine>powershell -WindowStyle Hidden -ExecutionPolicy Unrestricted -File "C:\Windows\Setup\Scripts\setup-workstation.ps1"</CommandLine>
+          <Description>Workstation setup</Description>
+        </SynchronousCommand>
+        <!-- 2. Security baseline (legal notice banner applied at END of this script) -->
+        <SynchronousCommand wcm:action="add">
+          <Order>2</Order>
+          <CommandLine>powershell -WindowStyle Hidden -ExecutionPolicy Unrestricted -File "C:\Windows\Setup\Scripts\apply-security-baseline.ps1"</CommandLine>
+          <Description>Security baseline</Description>
+        </SynchronousCommand>
+        <!-- 3. OEM drivers and firmware -->
+        <SynchronousCommand wcm:action="add">
+          <Order>3</Order>
+          <CommandLine>powershell -WindowStyle Hidden -ExecutionPolicy Unrestricted -File "C:\Windows\Setup\Scripts\install-drivers.ps1"</CommandLine>
+          <Description>OEM drivers</Description>
+        </SynchronousCommand>
+        <!-- 4. Windows Update — multi-pass, reboots until fully patched -->
+        <SynchronousCommand wcm:action="add">
+          <Order>4</Order>
+          <CommandLine>powershell -WindowStyle Hidden -ExecutionPolicy Unrestricted -File "C:\Windows\Setup\Scripts\run-updates.ps1"</CommandLine>
+          <Description>Full update pass</Description>
+        </SynchronousCommand>
+      </FirstLogonCommands>
+
+    </component>
+
+  </settings>
+
+</unattend>

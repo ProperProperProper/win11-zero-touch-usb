@@ -1,0 +1,4 @@
+# Binary installers live on the USB, not in git
+Installers/
+*.msi
+*.exe
